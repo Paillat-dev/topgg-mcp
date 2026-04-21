@@ -17,6 +17,10 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Paillat-dev/topgg-mcp"
+  },
   "keywords": [],
   "license": "ISC",
   "author": "Paillat-dev",
