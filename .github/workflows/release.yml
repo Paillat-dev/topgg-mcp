@@ -27,7 +27,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
           registry-url: https://registry.npmjs.org
 
@@ -66,4 +66,4 @@ jobs:
             dist/index.js
 
       - name: Publish to npm
-        run: pnpm publish --no-git-checks --access public --provenance --tag ${{ steps.version.outputs.tag }}
+        run: npm publish --access public --provenance --tag ${{ steps.version.outputs.tag }}
