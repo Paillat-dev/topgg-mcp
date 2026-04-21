@@ -1,0 +1,11 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+    tags-ignore: ["v*"]
+  pull_request:
+
+jobs:
+  checks:
+    uses: ./.github/workflows/checks.yml
