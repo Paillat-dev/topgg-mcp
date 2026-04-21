@@ -35,10 +35,17 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Set version from tag
+        id: version
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
-          npm pkg set version="$VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if [[ "$VERSION" =~ - ]]; then
+            TAG=$(echo "$VERSION" | sed -E 's/.*-([^.]+).*/\1/')
+          else
+            TAG="latest"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          pnpm version "$VERSION" --no-git-tag-version
 
       - name: Build
         run: pnpm build
@@ -47,7 +54,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if [[ "$GITHUB_REF_NAME" =~ -[a-zA-Z] ]]; then
+          if [[ "${{ steps.version.outputs.tag }}" != "latest" ]]; then
             PRERELEASE_FLAG="--prerelease"
           else
             PRERELEASE_FLAG=""
@@ -59,4 +66,4 @@ jobs:
             dist/index.js
 
       - name: Publish to npm
-        run: pnpm publish --no-git-checks --access public --provenance
+        run: pnpm publish --no-git-checks --access public --provenance --tag ${{ steps.version.outputs.tag }}
