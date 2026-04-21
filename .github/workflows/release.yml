@@ -16,6 +16,9 @@ jobs:
     permissions:
       contents: write
       id-token: write
+    environment:
+      name: npm
+      url: https://www.npmjs.com/package/topgg-mcp/v/${{ github.ref_name }}
 
     steps:
       - uses: actions/checkout@v4
@@ -44,12 +47,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          if [[ "$GITHUB_REF_NAME" =~ -[a-zA-Z] ]]; then
+            PRERELEASE_FLAG="--prerelease"
+          else
+            PRERELEASE_FLAG=""
+          fi
           gh release create "$GITHUB_REF_NAME" \
             --title "$GITHUB_REF_NAME" \
             --generate-notes \
+            $PRERELEASE_FLAG \
             dist/index.js
 
       - name: Publish to npm
         run: pnpm publish --no-git-checks --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

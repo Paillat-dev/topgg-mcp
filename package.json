@@ -1,6 +1,6 @@
 {
   "name": "topgg-mcp",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "MCP server for the Top.gg v1 API",
   "type": "module",
   "main": "dist/index.js",
