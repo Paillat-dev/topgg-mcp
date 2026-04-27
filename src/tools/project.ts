@@ -12,7 +12,10 @@ export async function updateProject(
   client: TopggClient,
   input: z.infer<typeof UpdateProjectInputSchema>,
 ): Promise<string> {
-  const body = UpdateProjectInputSchema.parse(input);
+  const parsed = UpdateProjectInputSchema.parse(input);
+  const body: Record<string, unknown> = {};
+  if (parsed.headline !== undefined) body["headline"] = parsed.headline;
+  if (parsed.pageContent !== undefined) body["page_content"] = parsed.pageContent;
   await client.patch<undefined>("/projects/@me", body);
   return "Project updated successfully.";
 }
