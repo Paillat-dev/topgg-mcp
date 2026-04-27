@@ -99,7 +99,10 @@ export function createServer(clients: Map<string, TopggClient>): McpServer {
     async (input) => {
       try {
         const client = resolveClient(clients, input.project);
-        const body = UpdateProjectInputSchema.parse(input);
+        const parsed = UpdateProjectInputSchema.parse(input);
+        const body: Record<string, unknown> = {};
+        if (parsed.headline !== undefined) body["headline"] = parsed.headline;
+        if (parsed.pageContent !== undefined) body["page_content"] = parsed.pageContent;
         await client.patch<undefined>("/projects/@me", body);
         return { content: [{ type: "text", text: "Project updated successfully." }] };
       } catch (error) {
