@@ -54,7 +54,7 @@ jobs:
             TAG="latest"
           fi
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          pnpm pkg set version="$VERSION"
+          npm pkg set version="$VERSION"
 
       - name: Build
         run: pnpm build
