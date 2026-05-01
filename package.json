@@ -24,7 +24,7 @@
   "keywords": [],
   "license": "ISC",
   "author": "Paillat-dev",
-  "packageManager": "pnpm@10.33.0",
+  "packageManager": "pnpm@10.33.2",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
     "zod": "^4.3.6"
