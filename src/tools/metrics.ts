@@ -7,7 +7,7 @@ export async function postMetrics(
   input: z.infer<typeof MetricsInputSchema>,
 ): Promise<string> {
   const body = MetricsInputSchema.parse(input);
-  await client.post<undefined>("/projects/@me/metrics", body);
+  await client.patch<undefined>("/projects/@me/metrics", body);
   return "Metrics submitted successfully.";
 }
 

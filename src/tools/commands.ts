@@ -7,6 +7,6 @@ export async function registerCommands(
   input: { commands: z.infer<typeof RegisterCommandsInputSchema> },
 ): Promise<string> {
   const commands = RegisterCommandsInputSchema.parse(input.commands);
-  await client.post<undefined>("/projects/@me/commands", commands);
+  await client.put<undefined>("/projects/@me/commands", commands);
   return `${commands.length.toString()} command(s) registered successfully.`;
 }

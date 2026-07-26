@@ -1,19 +1,19 @@
 # topgg-mcp
 
-A [Model Context Protocol](https://modelcontextprotocol.io) server for the [Top.gg v1 API](https://docs.top.gg/introduction), letting AI assistants manage your Top.gg bot or server listing directly.
+A [Model Context Protocol](https://modelcontextprotocol.io) server for the [Top.gg v1 API](https://docs.top.gg/api/v1/introduction), letting AI assistants manage a Top.gg Discord bot, Discord server, or Roblox game listing directly.
 
 ## Tools
 
-| Tool                  | Description                                                 |
-| --------------------- | ----------------------------------------------------------- |
-| `get_project`         | Retrieve the project associated with your token             |
-| `update_project`      | Update headline and page content (per locale)               |
-| `register_commands`   | Replace registered Discord slash commands                   |
-| `get_votes`           | Fetch paginated vote history (cursor-based)                 |
-| `check_user_vote`     | Check whether a specific user has voted                     |
-| `post_metrics`        | Submit metrics (server count, player count, etc.)           |
-| `post_metrics_batch`  | Submit up to 100 metrics entries in one request             |
-| `create_announcement` | Post a project announcement (rate-limited to 1 per 4 hours) |
+| Tool                  | Description                                                  |
+| --------------------- | ------------------------------------------------------------ |
+| `get_project`         | Retrieve the project associated with your token              |
+| `update_project`      | Update headline and page content (per locale)                |
+| `register_commands`   | Replace registered Discord slash commands (empty clears all) |
+| `get_votes`           | Fetch paginated vote history (cursor-based)                  |
+| `check_user_vote`     | Check whether a specific user has voted                      |
+| `post_metrics`        | Submit Discord bot/server or Roblox game metrics             |
+| `post_metrics_batch`  | Submit up to 100 metrics entries in one request              |
+| `create_announcement` | Post a categorized project announcement (1 per 4 hours)      |
 
 ## Requirements
 
@@ -75,11 +75,23 @@ You can also mix `TOPGG_TOKEN` (name: `"default"`) with named tokens if needed.
 
 The server targets the Top.gg v1 REST API (`https://top.gg/api/v1`). All requests are authenticated with `Authorization: Bearer <token>`. API errors are surfaced as readable tool errors using the RFC 7807 problem details format returned by Top.gg.
 
+| Method  | Endpoint                       | Tool                  |
+| ------- | ------------------------------ | --------------------- |
+| `GET`   | `/projects/@me`                | `get_project`         |
+| `PATCH` | `/projects/@me`                | `update_project`      |
+| `POST`  | `/projects/@me/announcements`  | `create_announcement` |
+| `PATCH` | `/projects/@me/metrics`        | `post_metrics`        |
+| `POST`  | `/projects/@me/metrics/batch`  | `post_metrics_batch`  |
+| `PUT`   | `/projects/@me/commands`       | `register_commands`   |
+| `GET`   | `/projects/@me/votes`          | `get_votes`           |
+| `GET`   | `/projects/@me/votes/:user_id` | `check_user_vote`     |
+
 **Rate limits** (enforced by Top.gg, not this server):
 
 - 100 requests/second globally
 - 60 requests/minute for bot endpoints
 - Violations result in a 1-hour block
+- Announcement cooldown responses include the API's `Retry-After` value in the tool error
 
 ## Development
 

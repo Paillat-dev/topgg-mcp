@@ -7,15 +7,33 @@ function makeClient(overrides: Partial<TopggClient>): TopggClient {
 }
 
 describe("postMetrics", () => {
-  it("posts discord bot metrics and returns success message", async () => {
-    const post = vi.fn().mockResolvedValue(undefined);
-    const client = makeClient({ post });
+  it("patches Discord bot metrics and returns success message", async () => {
+    const patch = vi.fn().mockResolvedValue(undefined);
+    const client = makeClient({ patch });
     const result = await postMetrics(client, { server_count: 42, shard_count: 2 });
-    expect(post).toHaveBeenCalledWith("/projects/@me/metrics", {
+    expect(patch).toHaveBeenCalledWith("/projects/@me/metrics", {
       server_count: 42,
       shard_count: 2,
     });
     expect(result).toBe("Metrics submitted successfully.");
+  });
+
+  it("rejects empty, mixed-platform, and negative metrics", async () => {
+    const patch = vi.fn();
+    const client = makeClient({ patch });
+    await expect(postMetrics(client, {})).rejects.toThrow();
+    await expect(postMetrics(client, { server_count: 1, player_count: 2 })).rejects.toThrow();
+    await expect(postMetrics(client, { server_count: -1 })).rejects.toThrow();
+    expect(patch).not.toHaveBeenCalled();
+  });
+
+  it("rejects online_count above member_count", async () => {
+    const patch = vi.fn();
+    const client = makeClient({ patch });
+    await expect(postMetrics(client, { member_count: 10, online_count: 11 })).rejects.toThrow(
+      /online_count/,
+    );
+    expect(patch).not.toHaveBeenCalled();
   });
 });
 

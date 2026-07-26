@@ -7,7 +7,7 @@ export async function createAnnouncement(
   input: z.infer<typeof AnnouncementInputSchema>,
 ): Promise<string> {
   const body = AnnouncementInputSchema.parse(input);
-  const data = await client.put<unknown>("/projects/@me/announcements", body);
+  const data = await client.post<unknown>("/projects/@me/announcements", body);
   const result = AnnouncementResponseSchema.parse(data);
   return JSON.stringify(result, undefined, 2);
 }

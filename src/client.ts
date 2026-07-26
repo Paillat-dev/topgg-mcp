@@ -7,8 +7,14 @@ export class TopggApiError extends Error {
     public readonly status: number,
     public readonly title: string,
     public readonly detail?: string,
+    public readonly retryAfterSeconds?: number,
   ) {
-    super(`Top.gg API error ${status.toString()}: ${title}${detail ? ` — ${detail}` : ""}`);
+    super(
+      `Top.gg API error ${status.toString()}: ${title}${detail ? ` — ${detail}` : ""}` +
+        (retryAfterSeconds === undefined
+          ? ""
+          : ` Retry after ${retryAfterSeconds.toString()} seconds.`),
+    );
     this.name = "TopggApiError";
   }
 }
@@ -67,7 +73,12 @@ export function createClient(token: string) {
     const problem = ProblemDetailsSchema.safeParse(json);
     const title = problem.success ? (problem.data.title ?? "Unknown error") : "Unknown error";
     const detail = problem.success ? problem.data.detail : undefined;
-    throw new TopggApiError(response.status, title, detail);
+    const retryAfterHeader = response.headers.get("Retry-After");
+    const retryAfterSeconds =
+      retryAfterHeader !== null && /^\d+$/.test(retryAfterHeader)
+        ? Number.parseInt(retryAfterHeader, 10)
+        : undefined;
+    throw new TopggApiError(response.status, title, detail, retryAfterSeconds);
   }
 
   return {

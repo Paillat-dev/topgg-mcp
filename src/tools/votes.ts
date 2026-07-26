@@ -3,7 +3,7 @@ import { VoteQueueResponseSchema, VoteResponseSchema } from "../schemas.js";
 
 export async function getVotes(
   client: TopggClient,
-  input: { cursor?: string; startDate?: string },
+  input: { cursor?: string | undefined; startDate?: string | undefined },
 ): Promise<string> {
   if (input.cursor === undefined && input.startDate === undefined) {
     throw new Error(
@@ -11,8 +11,11 @@ export async function getVotes(
     );
   }
   const params: Record<string, string> = {};
-  if (input.cursor !== undefined) params["cursor"] = input.cursor;
-  if (input.startDate !== undefined) params["startDate"] = input.startDate;
+  if (input.cursor !== undefined) {
+    params["cursor"] = input.cursor;
+  } else if (input.startDate !== undefined) {
+    params["startDate"] = input.startDate;
+  }
   const data = await client.get<unknown>("/projects/@me/votes", params);
   const result = VoteQueueResponseSchema.parse(data);
   return JSON.stringify(result, undefined, 2);
@@ -20,7 +23,7 @@ export async function getVotes(
 
 export async function checkUserVote(
   client: TopggClient,
-  input: { userId: string; source?: "topgg" | "discord" },
+  input: { userId: string; source?: "topgg" | "discord" | undefined },
 ): Promise<string> {
   const params: Record<string, string> = {};
   if (input.source !== undefined) params["source"] = input.source;
